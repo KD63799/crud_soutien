@@ -1,9 +1,8 @@
-// app.js
+const express = require("express");
+const bodyParser = require("body-parser");
 
-const express = require('express');
-const bodyParser = require('body-parser');
-
-const userControllers = require('./controllers/userControllers');
+const userControllers = require("./controllers/userControllers");
+const { initializeUsers } = require("./models/userManager");
 
 // Création d'une instance de l'application Express
 const app = express();
@@ -12,25 +11,26 @@ const app = express();
 app.use(bodyParser.json());
 
 // Définition d'une route de test
-app.get('/', (req, res) => {
-  res.send('Hello World');
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
 // Routes pour les utilisateurs
-app.get('/users', userControllers.getAllUsers);
-app.get('/users/:id', userControllers.getUserById);
-app.post('/users', userControllers.createUser);
-app.put('/users/:id', userControllers.updateUser);
-app.delete('/users/:id', userControllers.deleteUser);
+app.get("/users", userControllers.getAllUsers);
+app.get("/users/:id", userControllers.getUserById);
+app.post("/users", userControllers.createUser);
+app.put("/users/:id", userControllers.updateUser);
+app.delete("/users/:id", userControllers.deleteUser);
+app.post("/users/login", userControllers.login);
 
-// Configuration du serveur pour écouter sur le port 3000
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur en cours d'exécution sur le port ${PORT}`);
-});
+// Fonction pour démarrer le serveur après l'initialisation des utilisateurs
+const startServer = async () => {
+  await initializeUsers();
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Serveur en cours d'exécution sur le port ${PORT}`);
+  });
+};
 
-
-app.post(
-  "/users/login",
-  userControllers.getUserByUserName
-);
+// Démarrage du serveur
+startServer();
